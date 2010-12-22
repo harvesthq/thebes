@@ -1,0 +1,11 @@
+development:
+  - [ localhost, 3312 ]
+
+production:
+  - [ localhost, 3312 ]
+
+staging:
+  - [ localhost, 3312 ]
+
+test:
+  - [ localhost, 3312 ]

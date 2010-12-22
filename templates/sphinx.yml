@@ -1,0 +1,16 @@
+development: &defaults
+  'sphinx.conf':
+    mem_limit: '96M'
+
+production:
+  'sphinx.server1.conf':
+    mem_limit: '96M'
+  'sphinx.server2.conf':
+    mem_limit: '128M'
+
+staging:
+  <<: *defaults
+
+test:
+  <<: *defaults
+    

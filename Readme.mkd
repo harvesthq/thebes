@@ -1,0 +1,15 @@
+Thebes
+======
+
+* Encapsulated query syntax, hooks
+  * `result = Thebes::Query.run {|a| a.build_query_with_riddle }`
+* Loads riddle config file in Rails, handles multiple servers
+  * riddle.yml
+* Loads sphinx config file and template, handles multiple renders & destination files
+  * sphinx.conf.erb
+  * sphinx.yml
+* Rake task to generate config
+  * `rake thebes:build`
+* Generator for new configs
+  * `script/rails g sphinx_config`
+

@@ -1,0 +1,12 @@
+indexer
+{
+  mem_limit = <%= @mem_limit %>
+}
+
+searchd
+{
+  listen = 127.0.0.1:9312
+  log = <%= Rails.root %>/log/searchd.log
+  query_log = <%= Rails.root %>/searchd.query.log
+  pid_file = <%= Rails.root %>/searchd.<%= Rails.env.to_s %>.pid
+}
