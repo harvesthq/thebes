@@ -1,4 +1,5 @@
 require 'riddle'
+require 'riddle/1.10'
 
 module Thebes
 
