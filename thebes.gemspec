@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.description = %q{}
 
   s.add_dependency "riddle"
+  s.add_dependency "mysql2"
   s.add_dependency "actionpack"
   s.add_development_dependency "rspec"
   s.add_development_dependency "genspec"
