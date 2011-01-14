@@ -15,9 +15,15 @@ module Thebes
 
     initializer "thebes.initialize" do |app|
 
-      config_file = File.join(Rails.root, 'config', 'riddle.yml')
+      config_file = File.join(Rails.root, 'config', 'sphinx_servers.yml')
       if File.exists?(config_file)
-        Thebes::Query.servers = YAML.load(ERB.new(IO.read(config_file)).result)[Rails.env.to_s]
+        config = YAML.load(ERB.new(IO.read(config_file)).result)[Rails.env.to_s]
+        if config['sphinx_api']
+          Thebes::Query.servers = config['sphinx_api']
+        end
+        if config['sphinxql']
+          Thebes::Sphinxql::Client.servers = config['sphinxql']
+        end
       end
 
     end

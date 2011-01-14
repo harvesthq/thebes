@@ -7,7 +7,7 @@ class SphinxConfigGenerator < Rails::Generators::Base
   def copy_config_defaults
     copy_file 'sphinx.conf.erb', 'config/sphinx.conf.erb'
     copy_file 'sphinx.yml', 'config/sphinx.yml'
-    copy_file 'riddle.yml', 'config/riddle.yml'
+    copy_file 'sphinx_servers.yml', 'config/sphinx_servers.yml'
   end
 
 end
