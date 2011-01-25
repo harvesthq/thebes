@@ -8,7 +8,10 @@ namespace :thebes do
     config = YAML.load(ERB.new(IO.read(File.join(Rails.root, 'config', 'sphinx.yml'))).result)[Rails.env.to_s]
     generator = Thebes::ConfigWriter.new(File.join(Rails.root, 'config'))
     config.each do |file, conf|
-      generator.build File.join(Rails.root, 'config', file), (conf || {})
+      if file[0].chr != '/'
+        file = File.join(Rails.root, 'config', file)
+      end
+      generator.build file, (conf || {})
     end
   end
 
