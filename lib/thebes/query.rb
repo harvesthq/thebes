@@ -7,7 +7,7 @@ module Thebes
                    :before_running,
                    :servers
 
-    def initiaize *args
+    def initialize *args
       if !args.empty? || self.class.servers.empty?
         super *args
       else
