@@ -1,10 +1,10 @@
 development: &defaults
   sphinx_api:
     - [ localhost, 3312 ]
-  sphinxql:
-    - 
-      :host: localhost
-      :port: 3313
+  # sphinxql:
+  #   - 
+  #     :host: localhost
+  #     :port: 3313
 
 production:
   <<: *defaults
