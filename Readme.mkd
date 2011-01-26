@@ -1,15 +1,46 @@
 Thebes
 ======
 
-* Encapsulated query syntax, hooks
-  * `result = Thebes::Query.run {|a| a.build_query_with_riddle }`
-* Loads riddle config file in Rails, handles multiple servers
-  * riddle.yml
-* Loads sphinx config file and template, handles multiple renders & destination files
-  * sphinx.conf.erb
-  * sphinx.yml
-* Rake task to generate config
-  * `rake thebes:build`
-* Generator for new configs
-  * `script/rails g sphinx_config`
+Installation
+------------
+
+To use Thebes, just add it to your `Gemfile`:
+
+    gem 'thebes'
+    
+    # Or pin Thebes to git
+    # gem 'thebes',
+    #   :git => 'git@github.com:harvesthq/thebes.git'
+
+Then use `bundle install` to update your `Gemfile.lock`.  If your project is using
+Rails, you can take advantage of the generator to create your starting config files:
+
+    script/rails g sphinx_config
+
+This will create the three config files that Thebes requires for easy setup:
+
+* `sphinx.yml` - Configuration values for your sphinx.conf files.
+* `sphinx.conf.erb` - The template for your sphinx.conf files.
+* `sphinx_servers.yml` - Configuration of Rails, which Sphinx servers to connect to.
+
+Flavor to taste, and run `rake thebes:build` to generate your sphinx configuation.
+
+Querying via Sphinx's custom protocol
+-------------------------------------
+
+Generate a query against Sphinx via Riddle:
+
+    result = Andor::Query.run do |a|
+      # a here is an instance of Riddle::Client:
+      # http://rdoc.info/github/freelancing-god/riddle/master/Riddle/Client
+      a.apply_filter_like_in_riddle
+    end 
+
+`result` will be an instance of Riddle::Response (see:
+http://rdoc.info/github/freelancing-god/riddle/master/Riddle/Client/Response).
+Usually you will want to call `.next` on it to get your returned values from
+Sphinx.
+
+Querying via Sphinxql
+---------------------
 
