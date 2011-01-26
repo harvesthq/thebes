@@ -1,6 +1,8 @@
+require 'mysql2'
+
 module Thebes::Sphinxql
   
-  class Client < Mysql2::Client
+  class Client < ::Mysql2::Client
 
     cattr_accessor :servers
 
