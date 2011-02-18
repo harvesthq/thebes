@@ -1,0 +1,9 @@
+development:
+  adapter: mysql2
+  pool: 5
+  timeout: 5000
+  encoding: utf8
+  database: thebes_test
+  username: root
+  socket: /tmp/mysql.sock
+  password:

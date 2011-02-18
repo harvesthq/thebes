@@ -1,3 +1,6 @@
 pkg/*
 *.gem
 .bundle
+spec/support/database.yml
+spec/support/test.sphinx.conf
+tmp

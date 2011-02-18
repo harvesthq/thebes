@@ -1,0 +1,70 @@
+indexer
+{
+  mem_limit = 32M
+}
+
+searchd
+{
+  listen = 0.0.0.0:9333
+  # listen = 0.0.0.0:9333:mysql41
+  log = tmp/searchd.log
+  query_log = tmp/searchd.query.log
+  pid_file = tmp/searchd.pid
+}
+
+source items_core_0
+{
+  type = mysql
+  # sql_host = <%= @host %>
+  sql_user = <%= @username %>
+  sql_pass = <%= @password %>
+  sql_db = <%= @database %>
+  sql_sock = <%= @socket %>
+  sql_query_pre = SET NAMES utf8
+  sql_query_pre = SET TIME_ZONE = '+0:00'
+  sql_query = SELECT SQL_NO_CACHE \
+      ( `items`.`id` * 66 + 0 ) AS `id`, \
+      `items`.`id` AS `_id`, \
+      `items`.`name` as `name`, \
+      `items`.`active` AS `active`, \
+      `items`.`body` AS `body` \
+    FROM `items` \
+    WHERE \
+      `items`.`id` >= $start AND \
+      `items`.`id` <= $end \
+    ORDER BY NULL
+  sql_query_range = SELECT IFNULL(MIN(`id`), 1), IFNULL(MAX(`id`), 1) FROM `items` 
+
+  sql_attr_uint = _id
+  sql_attr_uint = active
+
+  sql_query_info = SELECT * FROM `items` WHERE `id` = (($id - 0) / 66)
+}
+
+index items_core
+{
+  source = items_core_0
+  path = tmp/items_core
+  charset_type = utf-8
+
+  enable_star = 1
+  
+  min_prefix_len = 3
+  index_exact_words = 1
+
+  morphology = stem_en
+  # , libstemmer_sv
+  
+  min_stemming_len = 3
+  min_word_len = 2
+
+  # This expand_keywords declaration is not working.
+  #
+  # expand_keywords = 1
+}
+
+index items
+{
+  type = distributed
+  local = items_core
+}

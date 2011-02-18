@@ -1,3 +1,4 @@
+require 'active_record'
 require File.dirname(__FILE__)+'/thebes/config_writer'
 require File.dirname(__FILE__)+'/thebes/query'
 require File.dirname(__FILE__)+'/thebes/sphinx_search'
@@ -9,12 +10,10 @@ module Thebes
 end
 
 require 'zlib'
-module ActiveRecord
-  class Base
-    class << self
-      def to_crc32
-        Zlib.crc32(self.name)
-      end
-    end
+ActiveRecord::Base.class_eval do
+
+  def self.to_crc32
+    Zlib.crc32(self.name)
   end
+
 end
