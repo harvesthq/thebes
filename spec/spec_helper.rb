@@ -9,7 +9,7 @@ Dir[File.join(File.dirname(__FILE__), 'support/**/*.rb')].each {|f| require f}
 
 RSpec.configure do |config|
   config.mock_with :mocha
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
   config.before :all do
 
     # Fetch a database configuration.
@@ -48,6 +48,13 @@ RSpec.configure do |config|
     #
     @sphinx.start
 
+  end
+  config.after :each do
+    ActiveRecord::Base.connection.execute('SHOW TABLES;').each do |table|
+      # Or whatever you think is appropriate.
+      next if table.index('schema_migrations') or table.index('roles')
+      ActiveRecord::Base.connection.execute("TRUNCATE #{table}")
+    end
   end
   config.after :all do
 

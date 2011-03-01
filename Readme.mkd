@@ -30,7 +30,7 @@ Querying via Sphinx's custom protocol
 
 Generate a query against Sphinx via Riddle:
 
-    result = Andor::Query.run do |a|
+    result = Thebes::Query.run do |a|
       # a here is an instance of Riddle::Client:
       # http://rdoc.info/github/freelancing-god/riddle/master/Riddle/Client
       a.apply_filter_like_in_riddle
