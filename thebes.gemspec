@@ -8,9 +8,9 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Matthew Beale"]
   s.email       = ["matt.beale@madhatted.com"]
-  s.homepage    = ""
-  s.summary     = %q{Thebes is a thin binding layer for Rails and Sphinx with Riddle}
-  s.description = %q{}
+  s.homepage    = "https://github.com/harvesthq/thebes"
+  s.summary     = %q{Thebes is a thin binding layer for Rails and Sphinx via Riddle and Mysql2.}
+  s.description = %q{Thebes is a thin binding layer for Rails and Sphinx via Riddle and Mysql2. Thebes expects you to write Sphinx configuration files by hand and have a rich understanding of Sphinx, but provides configuration files and templates to ease the process.}
 
   s.add_dependency "riddle"
   s.add_dependency "mysql2"
