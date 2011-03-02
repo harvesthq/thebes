@@ -1,6 +1,12 @@
 Thebes
 ======
 
+Thebes is a thin binding layer for [Rails](http://rubyonrails.org/) and
+[Sphinx](http://sphinxsearch.com/) via (Riddle)[https://github.com/freelancing-god/riddle]
+and (Mysql2)[https://github.com/brianmario/mysql2]. Thebes expects you to write
+Sphinx configuration files by hand and have a rich understanding of Sphinx, but
+provides configuration files and templates to ease the process.
+
 Installation
 ------------
 
@@ -36,11 +42,74 @@ Generate a query against Sphinx via Riddle:
       a.apply_filter_like_in_riddle
     end 
 
-`result` will be an instance of Riddle::Response (see:
-http://rdoc.info/github/freelancing-god/riddle/master/Riddle/Client/Response).
+`result` will be an instance of [Riddle::Response](http://rdoc.info/github/freelancing-god/riddle/master/Riddle/Client/Response).
 Usually you will want to call `.next` on it to get your returned values from
-Sphinx.
+Sphinx. A more complex usage example:
+
+    # sphinx_res is a raw result from Riddle.
+    #
+    sphinx_res = Thebes::Query.run do |q|
+      
+      # In Riddle, filters need to be added to a query before the
+      # actual query.
+      #
+      q.filters << Riddle::Client::Filter.new('active', [1])
+      
+      # Pull search terms of a query.
+      #
+      query = params[:search_terms].split(' ').collect {|word|
+        "( =#{word} | #{word} | #{word}* )"
+      }.join(' ')
+      
+      q.append_query query, 'documents' # Search index 'documents'.
+
+      # You can change the match_mode or alter the query in other
+      # ways.
+      #
+      # q.match_mode = :expr2
+    end
+
+    ids, weights = [], []
+    sphinx_res[0][:matches].each do |match|
+      ids << match[:attributes]['_id']
+      weights << match[:weight]
+    end
+
+    # Fetch documents from the database.
+    #
+    @documents = Document.find(ids)
+
+    # Sort documents by weight.
+    #
+    @documents.sort! {|a,b| weights[ids.index(b.id)] <=> weights[ids.index(a.id)] }
+
+Additionally, you can set procs to be run before the query block or right
+before the query is run:
+
+    # Usually found in config/initializers/thebes.rb
+    #
+    
+    # Before the Thebes::Query.run block.
+    #
+    Thebes::Query.before_query = Proc.new do |q|
+      q.match_mode = :any
+      q.max_matches = 10
+    end
+
+    # Just before the query is run.
+    #
+    Thebes::Query.before_running = Proc.new do |q|
+    end
 
 Querying via Sphinxql
 ---------------------
+
+Thebes has minimal support for querying Sphinx via the new [Sphinxql syntax](http://sphinxsearch.com/docs/manual-0.9.9.html#sphinxql). 
+Running a query returns a [Mysql2::Result](http://rdoc.info/github/brianmario/mysql2/master/Mysql2/Result) object.
+
+    # Do a search with SphinxQL.
+    #
+    @results = Thebes::Sphinxql::Query.run "SELECT * FROM items WHERE MATCH('Horwitz')"
+
+    @ids = @results.collect {|r| r['_id'] }
 
