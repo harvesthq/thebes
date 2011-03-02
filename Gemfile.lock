@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thebes (0.0.2)
+    thebes (0.0.3)
       actionpack (>= 3.0.3)
       activerecord (>= 3.0.3)
       mysql2

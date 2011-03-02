@@ -1,47 +1,11 @@
 require 'spec_helper'
 
-describe Thebes::Query, "after configuration" do
-
-  before(:all) {
-    Thebes::Query.servers = [['127.0.0.2', 111]]
-  }
-
-  subject { Thebes::Query.new }
-
-  its(:servers) { should == [['127.0.0.2', 111]] }
-
-  context "running query" do
-    
-    before(:each) {
-      Thebes::Query.any_instance.stubs(:run)
-    }
-
-    after(:each) {
-      Thebes::Query.run {|q| }
-    }
-
-    it "should run the query on an instance" do
-      Thebes::Query.any_instance.expects(:run)
-    end
-
-    it "should call the before_query callback" do
-      Thebes::Query.before_query = Proc.new {|q| }
-      Thebes::Query.before_query.expects(:call)
-    end
-
-    it "should call the before_running callback" do
-      Thebes::Query.before_running = Proc.new {|q| }
-      Thebes::Query.before_running.expects(:call)
-    end
-
-  end
-
-end
-
 describe Thebes::Query, "against live data" do
 
   before {
-    Thebes::Query.servers = [['127.0.0.1', 9333]]
+    Thebes::Sphinxql::Client.servers = [
+      { :host => '127.0.0.1', :port => 9334 }
+    ]
     Item.create \
       :name => "Larry",
       :active => true,
@@ -64,33 +28,28 @@ describe Thebes::Query, "against live data" do
   context "searching for 'Horwitz'" do
 
     before {
-      @result = Thebes::Query.run do |q|
-        q.append_query 'Horwitz', 'items'
-      end
+      @result = Thebes::Sphinxql::Query.run "SELECT * FROM items WHERE MATCH('Horwitz')"
     }
 
-    subject { @result.first[:matches] }
+    subject { @result.collect {|r| r } }
 
     its(:length) { should == 3 }
-    its(:first) { subject[:attributes]['_id'] == 2 }
-    its(:last) { subject[:attributes]['_id'] == 4 }
+    its(:first) { subject['_id'] == 2 }
+    its(:last) { subject['_id'] == 4 }
 
   end
 
   context "searching for 'Horwitz' with filter" do
 
     before {
-      @result = Thebes::Query.run do |q|
-        q.filters << Riddle::Client::Filter.new('active', [1])
-        q.append_query 'Horwitz', 'items'
-      end
+      @result = Thebes::Sphinxql::Query.run "SELECT * FROM items WHERE MATCH('Horwitz') AND active = 1"
     }
 
-    subject { @result.first[:matches] }
+    subject { @result.collect {|r| r } }
 
     its(:length) { should == 2 }
-    its(:first) { subject[:attributes]['_id'] == 2 }
-    its(:last) { subject[:attributes]['_id'] == 4 }
+    its(:first) { subject['_id'] == 2 }
+    its(:last) { subject['_id'] == 4 }
 
   end
 

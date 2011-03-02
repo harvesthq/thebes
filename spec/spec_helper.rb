@@ -10,43 +10,51 @@ Dir[File.join(File.dirname(__FILE__), 'support/**/*.rb')].each {|f| require f}
 RSpec.configure do |config|
   config.mock_with :mocha
   config.use_transactional_fixtures = false
-  config.before :all do
+  config.before :suite do
 
-    # Fetch a database configuration.
-    #
-    db_config = YAML.load( ERB.new( IO.read(
-      File.join(File.dirname(__FILE__), 'support/database.yml')
-    ) ).result )['test']
+    unless defined?(SPHINX)
 
-    # Write a sphinx configuation for test mode.
-    #
-    generator = Thebes::ConfigWriter.new \
-      File.join(File.dirname(__FILE__), 'support'),
-      'test.sphinx.conf'
-    generator.build \
-      File.join(File.dirname(__FILE__), 'support/test.sphinx.conf'),
-      db_config
+      # Fetch a database configuration.
+      #
+      db_config = YAML.load( ERB.new( IO.read(
+        File.join(File.dirname(__FILE__), 'support/database.yml')
+      ) ).result )['test']
 
-    # Give Riddle a dummy configuration so we can use it to
-    # control searchd.
-    #
-    r_config = Riddle::Configuration.new
-    r_config.searchd.pid_file = 'tmp/searchd.pid'
-    r_config.searchd.log = 'tmp/searchd.log'
+      # Write a sphinx configuation for test mode.
+      #
+      generator = Thebes::ConfigWriter.new \
+        File.join(File.dirname(__FILE__), 'support'),
+        'test.sphinx.conf'
+      generator.build \
+        File.join(File.dirname(__FILE__), 'support/test.sphinx.conf'),
+        db_config
 
-    # Create a Riddle controller.
-    #
-    @sphinx = Riddle::Controller.new \
-      r_config,
-      File.join(File.dirname(__FILE__), 'support/test.sphinx.conf')
+      # Give Riddle a dummy configuration so we can use it to
+      # control searchd.
+      #
+      r_config = Riddle::Configuration.new
+      r_config.searchd.pid_file = 'tmp/searchd.pid'
+      r_config.searchd.log = 'tmp/searchd.log'
+
+      # Create a Riddle controller.
+      #
+      SPHINX = Riddle::Controller.new \
+        r_config,
+        File.join(File.dirname(__FILE__), 'support/test.sphinx.conf')
+
+    end
 
     # Build an initial index.
     #
-    @sphinx.index
+    SPHINX.index
 
     # Start searchd.
     #
-    @sphinx.start
+    SPHINX.start
+
+    until SPHINX.running? do
+      sleep 0.1
+    end
 
   end
   config.after :each do
@@ -56,11 +64,16 @@ RSpec.configure do |config|
       ActiveRecord::Base.connection.execute("TRUNCATE #{table}")
     end
   end
-  config.after :all do
+  config.after :suite do
 
     # Stop searchd after specs run.
     #
-    @sphinx.stop
+    SPHINX.stop
+
+    while SPHINX.running? do
+      sleep 0.1
+      SPHINX.stop
+    end
 
   end
 end
