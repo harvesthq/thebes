@@ -14,7 +14,10 @@ class SphinxSearch
     @client.filters = filters
     @client.field_weights = options[:field_weights] if options[:field_weights]
     @client.index_weights = options[:index_weights] || {}
-    @client.sort_by = options[:sort_by] if options[:sort_by]
+    if options[:sort_by]
+      @client.sort_by = options[:sort_by]
+      @client.sort_mode = options[:sort_mode] || :extended
+    end
     @client.match_mode = :extended
   end
 
