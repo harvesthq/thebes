@@ -1,5 +1,8 @@
-Thebes
+Thebes 
 ======
+
+⚠️This project is no longer maintained ⚠️
+-------
 
 Thebes is a thin binding layer for [Rails](http://rubyonrails.org/) and
 [Sphinx](http://sphinxsearch.com/) via [Riddle](https://github.com/freelancing-god/riddle)
